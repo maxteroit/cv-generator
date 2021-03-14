@@ -21,7 +21,24 @@ class GeneratorController extends Controller
             'description' => ucwords($request->description),
         ));
         
-        header('Content-Disposition: attachment; filename=3row4column.docx');
-        $processor->saveAs('php://output');
+        //header('Content-Disposition: attachment; filename=3row4column.docx');
+        $file_path = storage_path('app\public\\'.$_COOKIE['file']);
+        $processor->saveAs($file_path.'.docx');
+
+        setcookie('hasUploaded', 1);
+
+        $domPdfPath = base_path('vendor/tecnickcom/tcpdf');
+        \PhpOffice\PhpWord\Settings::setPdfRendererPath($domPdfPath);
+        \PhpOffice\PhpWord\Settings::setPdfRendererName('TCPDF');
+         
+        //Load word file
+        $Content = \PhpOffice\PhpWord\IOFactory::load(storage_path('app/public/'.$_COOKIE['file'].'.docx')); 
+ 
+        //Save it into PDF
+        $PDFWriter = \PhpOffice\PhpWord\IOFactory::createWriter($Content,'PDF');
+        $PDFWriter->save($file_path.'.pdf'); 
+        unlink($file_path.'.docx');
+
+        return redirect('/');
     }
 }

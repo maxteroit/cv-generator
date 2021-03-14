@@ -1,6 +1,11 @@
 @extends('layouts.navbar')
 @section('content')
 
+@if (!isset($_COOKIE['file']))
+    @php
+        setcookie('file', time());
+    @endphp
+@endif
 <div class="container">
     <div class="row">
         <form action="/generate" method="post">
@@ -34,6 +39,26 @@
             </div>
             <button type="submit">Generate !</button>
         </form>
+
+        <div class="col-sm">
+
+        </div>
+
+        @if (isset($_COOKIE['hasUploaded']))
+            @if ($_COOKIE['hasUploaded'] == 1)
+                <div class="col-sm">
+                    <iframe
+                    src={{'/storage/'.$_COOKIE['file'].'.pdf#toolbar=0'}}
+                    width="350"
+                    height="500"
+                    >
+                    <p>This browser does not support PDF!</p>
+                    </iframe>
+                </div>
+            @endif
+        @else
+            @php setcookie('hasUploaded', 0); @endphp
+        @endif
     </div>
 </div>
 @endsection
